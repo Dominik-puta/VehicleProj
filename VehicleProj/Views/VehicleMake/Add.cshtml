@@ -1,0 +1,14 @@
+﻿@model VehicleProj.Models.AddVehicleMakeViewModel
+@{
+}
+<form method="post" action="Add">
+    <div class="form-group">
+        <label for="">Name</label>
+        <input type="text" class="form-control" asp-for="Name">
+    </div>
+    <div class="form-group">
+        <label for="">Abrv</label>
+        <input type="text" class="form-control" asp-for="Abrv">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

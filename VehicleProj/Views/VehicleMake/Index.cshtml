@@ -1,0 +1,62 @@
+﻿@model PaginatedList<VehicleProj.Models.Domain.VehicleMake>
+
+@ViewBag.VehicleMakeNames
+
+@{
+    ViewBag.Title = "VehicleMakes";
+}
+<h1>Vehicle Makes</h1>
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">Back to Full List</a> |
+            <a asp-action="Add">Create new Make</a>
+        </p>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Name</a></th>
+            <th>Abrv</th>
+            <th><a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">Created At</a></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var vehicleMake in Model )
+        {
+            <tr>
+                <td>@vehicleMake.Id</td>
+                <td>@vehicleMake.Name</td>
+                <td>@vehicleMake.Abrv</td>
+                <td>@vehicleMake.CreatedAt.ToString("dd-MM-yyyy")</td>
+                <td><a href="VehicleMake/View/@vehicleMake.Id">View</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
+
