@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using VehicleProj.Data;
 using VehicleProj.Models;
 using VehicleProj.Models.Domain;
+using VehicleProj.Services;
 
 namespace VehicleProj.Controllers
 {
@@ -11,18 +12,20 @@ namespace VehicleProj.Controllers
     {
         private readonly VehicleProjDbContext vehicleProjDbContext;
         private readonly IMapper _mapper;
+        private readonly IVehicleModelService vehicleModelService;
 
 
-        public VehicleModelController(IMapper mapper, VehicleProjDbContext vehicleProjDbContext)
+        public VehicleModelController(IMapper mapper, VehicleProjDbContext vehicleProjDbContext, IVehicleModelService _vehicleModelService)
         {
             this.vehicleProjDbContext = vehicleProjDbContext;
             this._mapper = mapper;
+            this.vehicleModelService = _vehicleModelService;
         }
         
         [HttpGet]
         public IActionResult Add()
         {
-            List<VehicleMake> vehicleMakes = vehicleProjDbContext.VehicleMakes.ToList();
+            List<VehicleMake> vehicleMakes = vehicleModelService.ReturnVehicleMakeList();
             ViewData["vehicleMakes"] = vehicleMakes;
             return (IActionResult)View();
         }
@@ -30,21 +33,10 @@ namespace VehicleProj.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddVehicleModelViewModel addVehicleModelViewModel)
         {
-            var vehicleMake = await vehicleProjDbContext.VehicleMakes.FindAsync(addVehicleModelViewModel.MakeId);
-            var vehicleModel = new VehicleModel()
-            {
-                Id = Guid.NewGuid(),
-                Name = addVehicleModelViewModel.Name,
-                Abrv = addVehicleModelViewModel.Abrv,
-                CreatedAt = DateTime.Now,
-                MakeId = addVehicleModelViewModel.MakeId,
-                MakeName = vehicleMake.Name
-            };
-            await vehicleProjDbContext.VehicleModels.AddAsync(vehicleModel);
-            await vehicleProjDbContext.SaveChangesAsync();
-
+            await vehicleModelService.VehicleModelAdd(addVehicleModelViewModel);
             return RedirectToAction("Index");
         }
+
         [HttpGet]
         public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? pageNumber)
         {
@@ -62,76 +54,53 @@ namespace VehicleProj.Controllers
             }
             ViewData["CurrentFilter"] = searchString;
             var vehicleModels = from s in vehicleProjDbContext.VehicleModels
-                                select s; //   _mapper.Map<VehicleModel, IndexVehicleModelViewModel>(s);
-                                
-
+                                select s;
+            IQueryable<IndexVehicleModelViewModel> models = _mapper.ProjectTo<IndexVehicleModelViewModel>(vehicleModels);
             if (!String.IsNullOrEmpty(searchString))
             {
-                vehicleModels = vehicleModels.Where(s => s.MakeName.ToUpper() == searchString.ToUpper());
+                models = models.Where(s => s.MakeName.ToUpper() == searchString.ToUpper());
             }
             switch (sortOrder)
             {
                 case "Name_desc":
-                    vehicleModels = vehicleModels.OrderByDescending(s => s.MakeName);
+                    models = models.OrderByDescending(s => s.MakeName);
                     break;
                 case "Date":
-                    vehicleModels = vehicleModels.OrderBy(s => s.CreatedAt);
+                    models = models.OrderBy(s => s.CreatedAt);
                     break;
                 case "Date_desc":
-                    vehicleModels = vehicleModels.OrderByDescending(s => s.CreatedAt);
+                    models = models.OrderByDescending(s => s.CreatedAt);
                     break;
                 default:
-                    vehicleModels = vehicleModels.OrderBy(s => s.MakeName);
+                    models = models.OrderBy(s => s.MakeName);
                     break;
             }
 
-            return View(await PaginatedList<VehicleModel>.CreateAsync(vehicleModels.AsNoTracking(), pageNumber ?? 1, pageSize));
+            return View(await PaginatedList<IndexVehicleModelViewModel>.CreateAsync(models.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
         [HttpGet]
         public async Task<IActionResult> View(Guid id)
         {
-            List<VehicleMake> vehicleMakes = vehicleProjDbContext.VehicleMakes.ToList();
+            List<VehicleMake> vehicleMakes = vehicleModelService.ReturnVehicleMakeList();
             ViewData["vehicleMakes"] = vehicleMakes;
-            var vehicleModel = await vehicleProjDbContext.VehicleModels.FirstOrDefaultAsync(x => x.Id == id);
-            if (vehicleModel != null)
+            var viewModel = await vehicleModelService.VehicleModelShowView(id);
+            if(viewModel != null)
             {
-
-                /*var viewModel = new UpdateVehicleModelViewModel()
-                {
-                    Id = vehicleModel.Id,
-                    Name = vehicleModel.Name,
-                    Abrv = vehicleModel.Abrv
-
-                };*/
-                var viewModel = _mapper.Map<VehicleModel, UpdateVehicleModelViewModel>(vehicleModel);
-                return await Task.Run(() => View("View", viewModel));
+                return View("view" , viewModel);
             }
             return RedirectToAction("Index");
         }
         [HttpPost]
         public async Task<IActionResult> View(UpdateVehicleModelViewModel model)
         {
-            var vehicleMake = await vehicleProjDbContext.VehicleMakes.FindAsync(model.MakeId);
-            var vehicleModel = await vehicleProjDbContext.VehicleModels.FindAsync(model.Id);
-            if (vehicleModel != null)
-            {
-                vehicleModel.Name = model.Name;
-                vehicleModel.Abrv = model.Abrv;
-                vehicleModel.MakeId = model.MakeId;
-                vehicleModel.MakeName = vehicleMake.Name;
-                await vehicleProjDbContext.SaveChangesAsync();
-            }
+            await vehicleModelService.VehicleModelEditView(model);
             return RedirectToAction("Index");
         }
         [HttpPost]
         public async Task<IActionResult> Delete(UpdateVehicleModelViewModel model)
         {
-            var vehicleModel = await vehicleProjDbContext.VehicleModels.FindAsync(model.Id);
-            if (vehicleModel != null)
-            {
-                vehicleProjDbContext.VehicleModels.Remove(vehicleModel);
-                await vehicleProjDbContext.SaveChangesAsync();
-            }
+            Console.WriteLine(model.Name);
+            await vehicleModelService.VehicleModelDelete(model);
             return RedirectToAction("Index");
         }
     }

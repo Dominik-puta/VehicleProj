@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using VehicleProj.Data;
 using VehicleProj.Helpers;
+using VehicleProj.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<VehicleProjDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("VehicleConnectionString")));
-
+builder.Services.AddScoped<IVehicleMakeService,VehicleMakeService>();
+builder.Services.AddScoped<IVehicleModelService,VehicleModelService>();
 
 
 var app = builder.Build();

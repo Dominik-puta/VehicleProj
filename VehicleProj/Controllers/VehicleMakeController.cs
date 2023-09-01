@@ -5,7 +5,7 @@ using System.Diagnostics;
 using VehicleProj.Data;
 using VehicleProj.Models;
 using VehicleProj.Models.Domain;
-
+using VehicleProj.Services;
 
 namespace VehicleProj.Controllers
 {
@@ -13,10 +13,12 @@ namespace VehicleProj.Controllers
     {
         private readonly VehicleProjDbContext vehicleProjDbContext;
         private readonly IMapper _mapper;
+        private readonly IVehicleMakeService vehicleMakeService;
 
 
-        public VehicleMakeController( IMapper mapper,VehicleProjDbContext vehicleProjDbContext)
+        public VehicleMakeController( IMapper mapper,VehicleProjDbContext vehicleProjDbContext, IVehicleMakeService _vehicleMakeService)
         {
+            this.vehicleMakeService = _vehicleMakeService;
             this.vehicleProjDbContext = vehicleProjDbContext;
             this._mapper = mapper;
         }
@@ -33,17 +35,9 @@ namespace VehicleProj.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddVehicleMakeViewModel addVehicleMakeViewModel) 
         {
-            var vehicleMake = new VehicleMake() 
-            {
-                Id = Guid.NewGuid(),
-                Name = addVehicleMakeViewModel.Name,
-                Abrv = addVehicleMakeViewModel.Abrv,
-                CreatedAt = DateTime.Now
-            };
-            await vehicleProjDbContext.VehicleMakes.AddAsync(vehicleMake);
-            await vehicleProjDbContext.SaveChangesAsync();
+            await vehicleMakeService.VehicleMakeAdd(addVehicleMakeViewModel);
 
-            return RedirectToAction("Add");
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -55,7 +49,6 @@ namespace VehicleProj.Controllers
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "Name_desc" : "";
             ViewData["DateSortParm"] = sortOrder == "Date" ? "Date_desc" : "Date";
-            
             if (searchString != null)
             {
                 pageNumber = 1;
@@ -65,70 +58,56 @@ namespace VehicleProj.Controllers
                 searchString = currentFilter;
             }
             ViewData["CurrentFilter"] = searchString;
-            var vehicleMakes = from s in vehicleProjDbContext.VehicleMakes
+            IQueryable<VehicleMake> vehicleMakes = from s in vehicleProjDbContext.VehicleMakes
                                select s;
+            IQueryable<IndexVehicleMakeViewModel> models = _mapper.ProjectTo<IndexVehicleMakeViewModel>(vehicleMakes);
+            Console.WriteLine(models.FirstOrDefault()?.Name);
             if(!String.IsNullOrEmpty(searchString))
             {
-                vehicleMakes = vehicleMakes.Where(s => s.Name.ToUpper() == searchString.ToUpper());
+                models = models.Where(s => s.Name.ToUpper() == searchString.ToUpper());
             }
             switch (sortOrder)
             {
                 case "Name_desc":
-                    vehicleMakes =  vehicleMakes.OrderByDescending(s => s.Name);
+                    models = models.OrderByDescending(s => s.Name);
                     break;
                 case "Date":
-                    vehicleMakes = vehicleMakes.OrderBy(s => s.CreatedAt);
+                    models = models.OrderBy(s => s.CreatedAt);
                     break;
                 case "Date_desc":
-                    vehicleMakes = vehicleMakes.OrderByDescending(s => s.CreatedAt);
+                    models = models.OrderByDescending(s => s.CreatedAt);
                     break;
                 default:
-                    vehicleMakes = vehicleMakes.OrderBy(s => s.Name);
+                    models = models.OrderBy(s => s.Name);
                     break;
             }
             
-            return View(await PaginatedList<VehicleMake>.CreateAsync(vehicleMakes.AsNoTracking(), pageNumber ?? 1,pageSize ));
+            return View(await PaginatedList<IndexVehicleMakeViewModel>.CreateAsync(models, pageNumber ?? 1,pageSize ));
         }
         [HttpGet]
         public async Task<IActionResult> View(Guid id)
         {
-            var vehicleMake = await vehicleProjDbContext.VehicleMakes.FirstOrDefaultAsync(x => x.Id == id);
-            if (vehicleMake != null)
+            
+                UpdateVehicleMakeViewModel viewModel =  vehicleMakeService.VehicleMakeShowView(id);
+                if(viewModel != null)
+                return  View("View", viewModel);
+            else
             {
-
-               /* var viewModel = new UpdateVehicleMakeViewModel()
-                {
-                    Id = vehicleMake.Id,
-                    Name = vehicleMake.Name,
-                    Abrv = vehicleMake.Abrv
-                };*/
-               var viewModel = _mapper.Map<VehicleMake, UpdateVehicleMakeViewModel>(vehicleMake);
-                return await Task.Run(() => View("View", viewModel));
+                Response.StatusCode = 404;
+                return View();
             }
-            return RedirectToAction("Index");
+
         }
         [HttpPost]
         public async Task<IActionResult> View(UpdateVehicleMakeViewModel model)
         {
-            var vehicleMake = await vehicleProjDbContext.VehicleMakes.FindAsync(model.Id);
-            if (vehicleMake != null)
-            {
-                vehicleMake.Name = model.Name;
-                vehicleMake.Abrv = model.Abrv;
-
-                await vehicleProjDbContext.SaveChangesAsync();
-            }
+            await vehicleMakeService.VehicleMakeEditView(model);
             return RedirectToAction("Index");
         }
         [HttpPost]
         public async Task<IActionResult> Delete(UpdateVehicleMakeViewModel model)
         {
-            var vehicleMake = await vehicleProjDbContext.VehicleMakes.FindAsync(model.Id);
-            if(vehicleMake != null)
-            {
-                vehicleProjDbContext.VehicleMakes.Remove(vehicleMake);
-                await vehicleProjDbContext.SaveChangesAsync();
-            }
+            await vehicleMakeService.VehicleMakeDelete(model);
             return RedirectToAction("Index");
         }
 
