@@ -2,10 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Reflection;
+using System.Text;
+using System.Linq.Dynamic.Core;
 using VehicleProj.Data;
 using VehicleProj.Models;
 using VehicleProj.Models.Domain;
 using VehicleProj.Services;
+using VehicleProj.Helpers;
 
 namespace VehicleProj.Controllers
 {
@@ -14,13 +18,15 @@ namespace VehicleProj.Controllers
         private readonly VehicleProjDbContext vehicleProjDbContext;
         private readonly IMapper _mapper;
         private readonly IVehicleMakeService vehicleMakeService;
+        private readonly ISortHelper<VehicleMake> _sortHelper;
 
 
-        public VehicleMakeController( IMapper mapper,VehicleProjDbContext vehicleProjDbContext, IVehicleMakeService _vehicleMakeService)
+        public VehicleMakeController( ISortHelper<VehicleMake> sortHelper, IMapper mapper,VehicleProjDbContext vehicleProjDbContext, IVehicleMakeService _vehicleMakeService)
         {
             this.vehicleMakeService = _vehicleMakeService;
             this.vehicleProjDbContext = vehicleProjDbContext;
             this._mapper = mapper;
+            this._sortHelper = sortHelper;
         }
 
 
@@ -45,10 +51,11 @@ namespace VehicleProj.Controllers
         public async  Task<ViewResult> Index(string sortOrder, string searchString, string currentFilter, int? pageNumber)
         {
             //Number of items per page
+            //TODO custom pageSize trough browser
             int pageSize = 5;
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "Name_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "Date" ? "Date_desc" : "Date";
+            ViewData["NameSortParm"] = sortOrder == "Name" ? "Name desc" : "Name";
+            ViewData["DateSortParm"] = sortOrder == "CreatedAt" ? "CreatedAt desc" : "CreatedAt";
             if (searchString != null)
             {
                 pageNumber = 1;
@@ -58,31 +65,9 @@ namespace VehicleProj.Controllers
                 searchString = currentFilter;
             }
             ViewData["CurrentFilter"] = searchString;
-            IQueryable<VehicleMake> vehicleMakes = from s in vehicleProjDbContext.VehicleMakes
-                               select s;
-            IQueryable<IndexVehicleMakeViewModel> models = _mapper.ProjectTo<IndexVehicleMakeViewModel>(vehicleMakes);
-            Console.WriteLine(models.FirstOrDefault()?.Name);
-            if(!String.IsNullOrEmpty(searchString))
-            {
-                models = models.Where(s => s.Name.ToUpper() == searchString.ToUpper());
-            }
-            switch (sortOrder)
-            {
-                case "Name_desc":
-                    models = models.OrderByDescending(s => s.Name);
-                    break;
-                case "Date":
-                    models = models.OrderBy(s => s.CreatedAt);
-                    break;
-                case "Date_desc":
-                    models = models.OrderByDescending(s => s.CreatedAt);
-                    break;
-                default:
-                    models = models.OrderBy(s => s.Name);
-                    break;
-            }
-            
-            return View(await PaginatedList<IndexVehicleMakeViewModel>.CreateAsync(models, pageNumber ?? 1,pageSize ));
+            var models = await vehicleMakeService.VehicleMakeShowIndex(sortOrder, searchString ,pageNumber ,pageSize);
+ 
+            return View(models);
         }
         [HttpGet]
         public async Task<IActionResult> View(Guid id)

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using VehicleProj.Data;
+using VehicleProj.Helpers;
 using VehicleProj.Models;
 using VehicleProj.Models.Domain;
 
@@ -11,12 +12,16 @@ namespace VehicleProj.Services
     {
         private readonly VehicleProjDbContext vehicleProjDbContext;
         private readonly IMapper _mapper;
+        private readonly ISortHelper<VehicleModel> _sortHelper;
+        private readonly IFilterHelper<VehicleModel> _filterHelper;
 
 
-        public VehicleModelService(IMapper mapper, VehicleProjDbContext vehicleProjDbContext)
+        public VehicleModelService(IMapper mapper, VehicleProjDbContext vehicleProjDbContext, ISortHelper<VehicleModel> sortHelper, IFilterHelper<VehicleModel> filterHelper)
         {
             this.vehicleProjDbContext = vehicleProjDbContext;
             this._mapper = mapper;
+            this._sortHelper= sortHelper;
+            this._filterHelper = filterHelper;
         }
 
         public async Task VehicleModelAdd(AddVehicleModelViewModel model)
@@ -26,6 +31,15 @@ namespace VehicleProj.Services
             vehicleModel.MakeName = vehicleMake.Name;
             await vehicleProjDbContext.VehicleModels.AddAsync(vehicleModel);
             await vehicleProjDbContext.SaveChangesAsync();
+        }
+        public async Task<PaginatedList<IndexVehicleModelViewModel>> VehicleModelShowIndex(string sortOrder, string searchString, int? pageNumber, int pageSize)
+        {
+            IQueryable<VehicleModel> vehicleModels = from s in vehicleProjDbContext.VehicleModels
+                                                   select s;
+            vehicleModels = _filterHelper.ApplyFitler(vehicleModels, searchString, "MakeName");
+            vehicleModels = _sortHelper.ApplySort(vehicleModels, sortOrder);
+            IQueryable<IndexVehicleModelViewModel> models = _mapper.ProjectTo<IndexVehicleModelViewModel>(vehicleModels);
+            return await PaginatedList<IndexVehicleModelViewModel>.CreateAsync(models, pageNumber ?? 1, pageSize);
         }
 
         public async Task VehicleModelDelete(UpdateVehicleModelViewModel model)

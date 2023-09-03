@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using VehicleProj.Data;
+using VehicleProj.Helpers;
 using VehicleProj.Models;
 using VehicleProj.Models.Domain;
+using System.Linq.Dynamic.Core;
 
 namespace VehicleProj.Services
 {
@@ -12,12 +14,17 @@ namespace VehicleProj.Services
     {
         private readonly VehicleProjDbContext vehicleProjDbContext;
         private readonly IMapper _mapper;
+        private readonly ISortHelper<VehicleMake> _sortHelper;
+        private readonly IFilterHelper<VehicleMake> _filterHelper;
 
 
-        public VehicleMakeService(IMapper mapper, VehicleProjDbContext vehicleProjDbContext)
+
+        public VehicleMakeService(IMapper mapper, VehicleProjDbContext vehicleProjDbContext, ISortHelper<VehicleMake> sortHelper, IFilterHelper<VehicleMake> filterHelper)
         {
             this.vehicleProjDbContext = vehicleProjDbContext;
             this._mapper = mapper;
+            this._sortHelper = sortHelper;
+            _filterHelper = filterHelper;
         }
 
         public async Task VehicleMakeAdd(AddVehicleMakeViewModel addVehicleMakeViewModel)
@@ -25,6 +32,17 @@ namespace VehicleProj.Services
             var vehicleMake = _mapper.Map<AddVehicleMakeViewModel, VehicleMake>(addVehicleMakeViewModel);
             await vehicleProjDbContext.VehicleMakes.AddAsync(vehicleMake);
             await vehicleProjDbContext.SaveChangesAsync();
+        }
+
+        public async Task<PaginatedList<IndexVehicleMakeViewModel>> VehicleMakeShowIndex(string sortOrder, string searchString, int? pageNumber, int pageSize)
+        {
+            IQueryable<VehicleMake> vehicleMakes = from s in vehicleProjDbContext.VehicleMakes
+                                                   select s;
+            vehicleMakes = _filterHelper.ApplyFitler(vehicleMakes, searchString, "Name");
+            vehicleMakes = _sortHelper.ApplySort(vehicleMakes, sortOrder);
+
+            IQueryable<IndexVehicleMakeViewModel> models = _mapper.ProjectTo<IndexVehicleMakeViewModel>(vehicleMakes);
+            return await PaginatedList<IndexVehicleMakeViewModel>.CreateAsync(models, pageNumber ?? 1, pageSize);
         }
 
         public UpdateVehicleMakeViewModel VehicleMakeShowView(Guid id)

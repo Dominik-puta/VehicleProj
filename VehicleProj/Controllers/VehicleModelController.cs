@@ -40,10 +40,12 @@ namespace VehicleProj.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? pageNumber)
         {
+            //Number of items per page
+            //TODO custom pageSize trough browser
             int pageSize = 5;
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "Name_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "Date" ? "Date_desc" : "Date";
+            ViewData["NameSortParm"] = sortOrder == "MakeName" ? "MakeName desc" : "MakeName";
+            ViewData["DateSortParm"] = sortOrder == "CreatedAt" ? "CreatedAt desc" : "CreatedAt";
             if (searchString != null)
             {
                 pageNumber = 1;
@@ -53,30 +55,8 @@ namespace VehicleProj.Controllers
                 searchString = currentFilter;
             }
             ViewData["CurrentFilter"] = searchString;
-            var vehicleModels = from s in vehicleProjDbContext.VehicleModels
-                                select s;
-            IQueryable<IndexVehicleModelViewModel> models = _mapper.ProjectTo<IndexVehicleModelViewModel>(vehicleModels);
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                models = models.Where(s => s.MakeName.ToUpper() == searchString.ToUpper());
-            }
-            switch (sortOrder)
-            {
-                case "Name_desc":
-                    models = models.OrderByDescending(s => s.MakeName);
-                    break;
-                case "Date":
-                    models = models.OrderBy(s => s.CreatedAt);
-                    break;
-                case "Date_desc":
-                    models = models.OrderByDescending(s => s.CreatedAt);
-                    break;
-                default:
-                    models = models.OrderBy(s => s.MakeName);
-                    break;
-            }
-
-            return View(await PaginatedList<IndexVehicleModelViewModel>.CreateAsync(models.AsNoTracking(), pageNumber ?? 1, pageSize));
+            var models =  await vehicleModelService.VehicleModelShowIndex(sortOrder, searchString,pageNumber,pageSize);
+            return View(models);
         }
         [HttpGet]
         public async Task<IActionResult> View(Guid id)

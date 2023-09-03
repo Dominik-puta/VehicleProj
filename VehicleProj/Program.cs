@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using VehicleProj.Data;
 using VehicleProj.Helpers;
+using VehicleProj.Models.Domain;
 using VehicleProj.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,10 @@ builder.Services.AddDbContext<VehicleProjDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("VehicleConnectionString")));
 builder.Services.AddScoped<IVehicleMakeService,VehicleMakeService>();
 builder.Services.AddScoped<IVehicleModelService,VehicleModelService>();
-
+builder.Services.AddScoped<ISortHelper<VehicleMake>, SortHelper<VehicleMake>>();
+builder.Services.AddScoped<IFilterHelper<VehicleMake>, FilterHelper<VehicleMake>>();
+builder.Services.AddScoped<ISortHelper<VehicleModel>, SortHelper<VehicleModel>>();
+builder.Services.AddScoped<IFilterHelper<VehicleModel>,FilterHelper<VehicleModel>>();
 
 var app = builder.Build();
 

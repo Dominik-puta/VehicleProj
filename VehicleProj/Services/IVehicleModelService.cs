@@ -9,6 +9,7 @@ namespace VehicleProj.Services
         Task VehicleModelAdd(AddVehicleModelViewModel model);
         Task VehicleModelDelete(UpdateVehicleModelViewModel model);
         Task VehicleModelEditView(UpdateVehicleModelViewModel model);
+        Task<PaginatedList<IndexVehicleModelViewModel>> VehicleModelShowIndex(string sortOrder, string searchString, int? pageNumber, int pageSize);
         Task<UpdateVehicleModelViewModel> VehicleModelShowView(Guid id);
     }
 }
