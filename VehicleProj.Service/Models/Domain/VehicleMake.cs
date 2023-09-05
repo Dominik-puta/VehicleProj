@@ -1,4 +1,4 @@
-﻿namespace VehicleProj.Models.Domain
+﻿namespace VehicleProj.Service.Models.Domain
 {
     public class VehicleMake
     {

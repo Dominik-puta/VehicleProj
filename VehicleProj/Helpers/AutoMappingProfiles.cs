@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore.Update.Internal;
-using VehicleProj.Models;
-using VehicleProj.Models.Domain;
+using VehicleProj.MVC.Models;
+using VehicleProj.Service.Models.Domain;
 
 namespace VehicleProj.Helpers
 {
@@ -9,6 +9,8 @@ namespace VehicleProj.Helpers
     {
         public AutoMappingProfiles()
         {
+
+
             CreateMap<VehicleMake, IndexVehicleMakeViewModel>().ReverseMap();
             CreateMap<VehicleMake, UpdateVehicleMakeViewModel>().ReverseMap();
             CreateMap<AddVehicleMakeViewModel, VehicleMake>()
@@ -21,4 +23,6 @@ namespace VehicleProj.Helpers
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(u => DateTime.Now));
         }
     }
-}
+        
+    }
+

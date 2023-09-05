@@ -1,32 +1,22 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using System.Reflection;
-using System.Text;
-using System.Linq.Dynamic.Core;
-using VehicleProj.Data;
-using VehicleProj.Models;
-using VehicleProj.Models.Domain;
-using VehicleProj.Services;
-using VehicleProj.Helpers;
+using VehicleProj.MVC.Models;
+using VehicleProj.Service.Models.Domain;
+using VehicleProj.Service.Services;
 
-namespace VehicleProj.Controllers
+namespace VehicleProj.MVC.Controllers
 {
     public class VehicleMakeController : Controller
     {
-        private readonly VehicleProjDbContext vehicleProjDbContext;
         private readonly IMapper _mapper;
         private readonly IVehicleMakeService vehicleMakeService;
-        private readonly ISortHelper<VehicleMake> _sortHelper;
 
 
-        public VehicleMakeController( ISortHelper<VehicleMake> sortHelper, IMapper mapper,VehicleProjDbContext vehicleProjDbContext, IVehicleMakeService _vehicleMakeService)
+        public VehicleMakeController( IMapper mapper, IVehicleMakeService _vehicleMakeService)
         {
             this.vehicleMakeService = _vehicleMakeService;
-            this.vehicleProjDbContext = vehicleProjDbContext;
             this._mapper = mapper;
-            this._sortHelper = sortHelper;
         }
 
 
@@ -41,7 +31,9 @@ namespace VehicleProj.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddVehicleMakeViewModel addVehicleMakeViewModel) 
         {
-            await vehicleMakeService.VehicleMakeAdd(addVehicleMakeViewModel);
+
+            VehicleMake vehicleMake = _mapper.Map<AddVehicleMakeViewModel, VehicleMake>(addVehicleMakeViewModel);
+            await vehicleMakeService.VehicleMakeAdd(vehicleMake);
 
             return RedirectToAction("Index");
         }
@@ -65,17 +57,18 @@ namespace VehicleProj.Controllers
                 searchString = currentFilter;
             }
             ViewData["CurrentFilter"] = searchString;
+            //Mapper
             var models = await vehicleMakeService.VehicleMakeShowIndex(sortOrder, searchString ,pageNumber ,pageSize);
- 
             return View(models);
         }
         [HttpGet]
         public async Task<IActionResult> View(Guid id)
         {
-            
-                UpdateVehicleMakeViewModel viewModel =  vehicleMakeService.VehicleMakeShowView(id);
+
+                VehicleMake vehicleMake =  vehicleMakeService.VehicleMakeShowView(id);
+            UpdateVehicleMakeViewModel viewModel = _mapper.Map<VehicleMake, UpdateVehicleMakeViewModel>(vehicleMake);
                 if(viewModel != null)
-                return  View("View", viewModel);
+                return   View("View", viewModel);
             else
             {
                 Response.StatusCode = 404;
@@ -86,13 +79,15 @@ namespace VehicleProj.Controllers
         [HttpPost]
         public async Task<IActionResult> View(UpdateVehicleMakeViewModel model)
         {
-            await vehicleMakeService.VehicleMakeEditView(model);
+            VehicleMake vehicleMake = _mapper.Map<UpdateVehicleMakeViewModel, VehicleMake>(model);
+            await vehicleMakeService.VehicleMakeEditView(vehicleMake);
             return RedirectToAction("Index");
         }
         [HttpPost]
         public async Task<IActionResult> Delete(UpdateVehicleMakeViewModel model)
         {
-            await vehicleMakeService.VehicleMakeDelete(model);
+            VehicleMake vehicleMake = _mapper.Map<UpdateVehicleMakeViewModel, VehicleMake>(model);
+            await vehicleMakeService.VehicleMakeDelete(vehicleMake);
             return RedirectToAction("Index");
         }
 

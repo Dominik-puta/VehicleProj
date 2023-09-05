@@ -1,4 +1,4 @@
-﻿namespace VehicleProj.Models
+﻿namespace VehicleProj.MVC.Models
 {
     public class UpdateVehicleMakeViewModel
     {

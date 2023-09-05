@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using VehicleProj.Models.Domain;
+using VehicleProj.Service.Models.Domain;
 
-namespace VehicleProj.Data
+namespace VehicleProj.Service.Data
 {
     public class VehicleProjDbContext : DbContext
     {

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using VehicleProj.Data;
+using VehicleProj.Service.Data;
 using VehicleProj.Helpers;
-using VehicleProj.Models.Domain;
-using VehicleProj.Services;
+using VehicleProj.Service.Models.Domain;
+using VehicleProj.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

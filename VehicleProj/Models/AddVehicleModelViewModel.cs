@@ -1,6 +1,5 @@
-﻿using VehicleProj.Models.Domain;
-
-namespace VehicleProj.Models
+﻿
+namespace VehicleProj.MVC.Models
 {
     public class AddVehicleModelViewModel
     {

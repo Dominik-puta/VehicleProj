@@ -1,23 +1,20 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using VehicleProj.Data;
-using VehicleProj.Models;
-using VehicleProj.Models.Domain;
-using VehicleProj.Services;
+
+using VehicleProj.Service.Models.Domain;
+using VehicleProj.MVC.Models;
+using VehicleProj.Service.Services;
 
 namespace VehicleProj.Controllers
 {
     public class VehicleModelController : Controller
     {
-        private readonly VehicleProjDbContext vehicleProjDbContext;
         private readonly IMapper _mapper;
         private readonly IVehicleModelService vehicleModelService;
 
 
-        public VehicleModelController(IMapper mapper, VehicleProjDbContext vehicleProjDbContext, IVehicleModelService _vehicleModelService)
+        public VehicleModelController(IMapper mapper, IVehicleModelService _vehicleModelService)
         {
-            this.vehicleProjDbContext = vehicleProjDbContext;
             this._mapper = mapper;
             this.vehicleModelService = _vehicleModelService;
         }
@@ -33,7 +30,8 @@ namespace VehicleProj.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddVehicleModelViewModel addVehicleModelViewModel)
         {
-            await vehicleModelService.VehicleModelAdd(addVehicleModelViewModel);
+            VehicleModel vehicleModel = _mapper.Map<AddVehicleModelViewModel, VehicleModel>(addVehicleModelViewModel);
+            await vehicleModelService.VehicleModelAdd(vehicleModel);
             return RedirectToAction("Index");
         }
 
@@ -63,7 +61,8 @@ namespace VehicleProj.Controllers
         {
             List<VehicleMake> vehicleMakes = vehicleModelService.ReturnVehicleMakeList();
             ViewData["vehicleMakes"] = vehicleMakes;
-            var viewModel = await vehicleModelService.VehicleModelShowView(id);
+            var vehicleModel = await vehicleModelService.VehicleModelShowView(id);
+            UpdateVehicleModelViewModel viewModel = _mapper.Map<VehicleModel, UpdateVehicleModelViewModel>(vehicleModel);
             if(viewModel != null)
             {
                 return View("view" , viewModel);
@@ -73,14 +72,15 @@ namespace VehicleProj.Controllers
         [HttpPost]
         public async Task<IActionResult> View(UpdateVehicleModelViewModel model)
         {
-            await vehicleModelService.VehicleModelEditView(model);
+            VehicleModel vehicleModel = _mapper.Map<UpdateVehicleModelViewModel, VehicleModel>(model);
+            await vehicleModelService.VehicleModelEditView(vehicleModel);
             return RedirectToAction("Index");
         }
         [HttpPost]
         public async Task<IActionResult> Delete(UpdateVehicleModelViewModel model)
         {
-            Console.WriteLine(model.Name);
-            await vehicleModelService.VehicleModelDelete(model);
+            VehicleModel vehicleModel = _mapper.Map<UpdateVehicleModelViewModel, VehicleModel>(model);
+            await vehicleModelService.VehicleModelDelete(vehicleModel);
             return RedirectToAction("Index");
         }
     }
