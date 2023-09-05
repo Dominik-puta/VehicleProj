@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
 using VehicleProj.MVC.Models;
 using VehicleProj.Service.Models.Domain;
@@ -40,14 +41,15 @@ namespace VehicleProj.MVC.Controllers
 
         [HttpGet]
         [HttpPost]
-        public async  Task<ViewResult> Index(string sortOrder, string searchString, string currentFilter, int? pageNumber)
+        public async  Task<ViewResult> Index(string sortOrder, string searchString, string currentFilter, int? pageNumber, int? pageSize)
         {
-            //Number of items per page
-            //TODO custom pageSize trough browser
-            int pageSize = 5;
+
+            int defaSize = pageSize ?? 5;
+            ViewData["PageSize"] = defaSize;
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = sortOrder == "Name" ? "Name desc" : "Name";
             ViewData["DateSortParm"] = sortOrder == "CreatedAt" ? "CreatedAt desc" : "CreatedAt";
+
             if (searchString != null)
             {
                 pageNumber = 1;
@@ -57,8 +59,7 @@ namespace VehicleProj.MVC.Controllers
                 searchString = currentFilter;
             }
             ViewData["CurrentFilter"] = searchString;
-            //Mapper
-            var models = await vehicleMakeService.VehicleMakeShowIndex(sortOrder, searchString ,pageNumber ,pageSize);
+            var models = await vehicleMakeService.VehicleMakeShowIndex(sortOrder, searchString ,pageNumber ,defaSize);
             return View(models);
         }
         [HttpGet]

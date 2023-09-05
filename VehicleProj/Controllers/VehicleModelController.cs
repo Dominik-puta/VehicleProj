@@ -36,11 +36,12 @@ namespace VehicleProj.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? pageNumber)
+        public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? pageNumber, int? pageSize)
         {
             //Number of items per page
             //TODO custom pageSize trough browser
-            int pageSize = 5;
+            int defaSize = pageSize ?? 5;
+            ViewData["PageSize"] = defaSize;
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = sortOrder == "MakeName" ? "MakeName desc" : "MakeName";
             ViewData["DateSortParm"] = sortOrder == "CreatedAt" ? "CreatedAt desc" : "CreatedAt";
@@ -53,7 +54,7 @@ namespace VehicleProj.Controllers
                 searchString = currentFilter;
             }
             ViewData["CurrentFilter"] = searchString;
-            var models =  await vehicleModelService.VehicleModelShowIndex(sortOrder, searchString,pageNumber,pageSize);
+            var models =  await vehicleModelService.VehicleModelShowIndex(sortOrder, searchString,pageNumber,defaSize);
             return View(models);
         }
         [HttpGet]
