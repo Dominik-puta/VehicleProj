@@ -6,5 +6,7 @@
         public string Name { get; set; }
         public string Abrv { get; set; }
         public DateTime CreatedAt { get; set; }
+
+        public ICollection<VehicleModel> VehicleModels { get; set; }
     }
 }

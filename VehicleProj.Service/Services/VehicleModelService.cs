@@ -22,14 +22,13 @@ namespace VehicleProj.Service.Services
         public async Task VehicleModelAdd(VehicleModel model)
         {
             var vehicleMake = await vehicleProjDbContext.VehicleMakes.FindAsync(model.MakeId);
-            model.MakeName = vehicleMake.Name;
+           // model.MakeName = vehicleMake.Name;
             await vehicleProjDbContext.VehicleModels.AddAsync(model);
             await vehicleProjDbContext.SaveChangesAsync();
         }
         public async Task<PaginatedList<VehicleModel>> VehicleModelShowIndex(string sortOrder, string searchString, int? pageNumber, int pageSize)
         {
-            IQueryable<VehicleModel> vehicleModels = from s in vehicleProjDbContext.VehicleModels
-                                                   select s;
+            IQueryable<VehicleModel> vehicleModels = vehicleProjDbContext.VehicleModels.Include(c => c.Make);
             vehicleModels = _filterHelper.ApplyFitler(vehicleModels, searchString, "MakeName");
             vehicleModels = _sortHelper.ApplySort(vehicleModels, sortOrder);
             return await PaginatedList<VehicleModel>.CreateAsync(vehicleModels, pageNumber ?? 1, pageSize);
@@ -38,6 +37,7 @@ namespace VehicleProj.Service.Services
         public async Task VehicleModelDelete(VehicleModel model)
         {
             var vehicleModel = await vehicleProjDbContext.VehicleModels.FindAsync(model.Id);
+
             if (vehicleModel != null)
             {
                 vehicleProjDbContext.VehicleModels.Remove(vehicleModel);
@@ -51,7 +51,7 @@ namespace VehicleProj.Service.Services
             var vehicleModel = await vehicleProjDbContext.VehicleModels.FindAsync(model.Id);
             if (vehicleModel != null)
             {
-                vehicleModel.MakeName = vehicleMake.Name;        
+             //   vehicleModel.MakeName = vehicleMake.Name;        
                 await vehicleProjDbContext.SaveChangesAsync();
             }
         }
@@ -61,6 +61,8 @@ namespace VehicleProj.Service.Services
             var vehicleModel = await vehicleProjDbContext.VehicleModels.FirstOrDefaultAsync(x => x.Id == id);
             if (vehicleModel != null)
             {
+                Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                Console.WriteLine(vehicleModel.Make.Name);
                 return vehicleModel;
             }
             return null;

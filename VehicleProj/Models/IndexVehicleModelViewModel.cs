@@ -1,4 +1,6 @@
-﻿namespace VehicleProj.MVC.Models
+﻿using VehicleProj.Service.Models.Domain;
+
+namespace VehicleProj.MVC.Models
 {
     public class IndexVehicleModelViewModel
     {
@@ -8,9 +10,9 @@
 
         public string Abrv { get; set; }
 
-        public string MakeName { get; set; }
-
         public DateTime CreatedAt { get; set; }
+
+        public VehicleMake Make { get; set; }
 
         public Guid MakeId { get; set; }
     }

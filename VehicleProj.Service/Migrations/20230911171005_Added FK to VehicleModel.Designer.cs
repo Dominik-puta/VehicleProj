@@ -12,8 +12,8 @@ using VehicleProj.Service.Data;
 namespace VehicleProj.Migrations
 {
     [DbContext(typeof(VehicleProjDbContext))]
-    [Migration("20230830002555_RemoveFK2")]
-    partial class RemoveFK2
+    [Migration("20230911171005_Added FK to VehicleModel")]
+    partial class AddedFKtoVehicleModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace VehicleProj.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("VehicleProj.Models.Domain.VehicleMake", b =>
+            modelBuilder.Entity("VehicleProj.Service.Models.Domain.VehicleMake", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -47,7 +47,7 @@ namespace VehicleProj.Migrations
                     b.ToTable("VehicleMakes");
                 });
 
-            modelBuilder.Entity("VehicleProj.Models.Domain.VehicleModel", b =>
+            modelBuilder.Entity("VehicleProj.Service.Models.Domain.VehicleModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -63,17 +63,31 @@ namespace VehicleProj.Migrations
                     b.Property<Guid>("MakeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("MakeName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MakeId");
+
                     b.ToTable("VehicleModels");
+                });
+
+            modelBuilder.Entity("VehicleProj.Service.Models.Domain.VehicleModel", b =>
+                {
+                    b.HasOne("VehicleProj.Service.Models.Domain.VehicleMake", "Make")
+                        .WithMany("vehicleModels")
+                        .HasForeignKey("MakeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Make");
+                });
+
+            modelBuilder.Entity("VehicleProj.Service.Models.Domain.VehicleMake", b =>
+                {
+                    b.Navigation("vehicleModels");
                 });
 #pragma warning restore 612, 618
         }

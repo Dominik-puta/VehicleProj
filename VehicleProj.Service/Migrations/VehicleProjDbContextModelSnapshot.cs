@@ -22,7 +22,7 @@ namespace VehicleProj.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("VehicleProj.Models.Domain.VehicleMake", b =>
+            modelBuilder.Entity("VehicleProj.Service.Models.Domain.VehicleMake", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,10 +41,10 @@ namespace VehicleProj.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VehicleMakes");
+                    b.ToTable("VehicleMakes", (string)null);
                 });
 
-            modelBuilder.Entity("VehicleProj.Models.Domain.VehicleModel", b =>
+            modelBuilder.Entity("VehicleProj.Service.Models.Domain.VehicleModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,17 +60,31 @@ namespace VehicleProj.Migrations
                     b.Property<Guid>("MakeId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("MakeName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("VehicleModels");
+                    b.HasIndex("MakeId");
+
+                    b.ToTable("VehicleModels", (string)null);
+                });
+
+            modelBuilder.Entity("VehicleProj.Service.Models.Domain.VehicleModel", b =>
+                {
+                    b.HasOne("VehicleProj.Service.Models.Domain.VehicleMake", "Make")
+                        .WithMany("vehicleModels")
+                        .HasForeignKey("MakeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Make");
+                });
+
+            modelBuilder.Entity("VehicleProj.Service.Models.Domain.VehicleMake", b =>
+                {
+                    b.Navigation("vehicleModels");
                 });
 #pragma warning restore 612, 618
         }

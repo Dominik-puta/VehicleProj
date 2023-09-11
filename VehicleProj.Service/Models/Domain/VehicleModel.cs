@@ -9,10 +9,10 @@
 
         public string Abrv { get; set; }
 
-        public string MakeName { get; set; }
-
         public DateTime CreatedAt { get; set; }
-        
+
+        public VehicleMake Make { get; set; }
+
         public Guid MakeId { get; set; }
     }
 }
