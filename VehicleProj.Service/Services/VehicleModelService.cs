@@ -61,8 +61,6 @@ namespace VehicleProj.Service.Services
             var vehicleModel = await vehicleProjDbContext.VehicleModels.FirstOrDefaultAsync(x => x.Id == id);
             if (vehicleModel != null)
             {
-                Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                Console.WriteLine(vehicleModel.Make.Name);
                 return vehicleModel;
             }
             return null;

@@ -28,7 +28,6 @@ namespace VehicleProj
         {
             var count = await source.CountAsync();
             var items = await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
-            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             return new PaginatedList<T>(items, count, pageIndex, pageSize);
         }
     }

@@ -55,9 +55,6 @@ namespace VehicleProj.Controllers
             }
             ViewData["CurrentFilter"] = searchString;
             var models =  await vehicleModelService.VehicleModelShowIndex(sortOrder, searchString,pageNumber,defaSize);
-            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            var a = models.First().Make;
-            Console.WriteLine(a);
             return View(models);
         }
         [HttpGet]
