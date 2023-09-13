@@ -2,6 +2,8 @@
 using VehicleProj.Service.Data;
 using VehicleProj.Helpers;
 using VehicleProj.Service.Models.Domain;
+using VehicleProj.Service.Helpers;
+using Microsoft.Data.SqlClient;
 
 namespace VehicleProj.Service.Services
 {
@@ -26,12 +28,15 @@ namespace VehicleProj.Service.Services
             await vehicleProjDbContext.VehicleModels.AddAsync(model);
             await vehicleProjDbContext.SaveChangesAsync();
         }
-        public async Task<PaginatedList<VehicleModel>> VehicleModelShowIndex(string sortOrder, string searchString, int? pageNumber, int pageSize)
+        public async Task<PaginatedList<VehicleModel>> VehicleModelShowIndex(IndexArgs indexArgs)
         {
             IQueryable<VehicleModel> vehicleModels = vehicleProjDbContext.VehicleModels.Include(c => c.Make);
-            vehicleModels = _filterHelper.ApplyFitler(vehicleModels, searchString, "MakeName");
-            vehicleModels = _sortHelper.ApplySort(vehicleModels, sortOrder);
-            return await PaginatedList<VehicleModel>.CreateAsync(vehicleModels, pageNumber ?? 1, pageSize);
+            vehicleModels = _filterHelper.ApplyFitler(vehicleModels, indexArgs.searchString, "Make.Name");
+            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            Console.WriteLine(indexArgs.sortOrder);
+            vehicleModels = _sortHelper.ApplySort(vehicleModels, indexArgs.sortOrder);
+
+            return await PaginatedList<VehicleModel>.CreateAsync(vehicleModels, indexArgs.pageNumber, indexArgs.pageSize);
         }
 
         public async Task VehicleModelDelete(VehicleModel model)

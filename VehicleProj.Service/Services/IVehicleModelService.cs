@@ -1,4 +1,5 @@
-﻿using VehicleProj.Service.Models.Domain;
+﻿using VehicleProj.Service.Helpers;
+using VehicleProj.Service.Models.Domain;
 
 namespace VehicleProj.Service.Services
 {
@@ -8,7 +9,7 @@ namespace VehicleProj.Service.Services
         Task VehicleModelAdd(VehicleModel model);
         Task VehicleModelDelete(VehicleModel model);
         Task VehicleModelEditView(VehicleModel model);
-        Task<PaginatedList<VehicleModel>> VehicleModelShowIndex(string sortOrder, string searchString, int? pageNumber, int pageSize);
+        Task<PaginatedList<VehicleModel>> VehicleModelShowIndex(IndexArgs indexArgs);
         Task<VehicleModel> VehicleModelShowView(Guid id);
     }
 }

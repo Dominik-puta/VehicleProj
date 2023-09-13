@@ -41,9 +41,10 @@ namespace VehicleProj.Controllers
             //Number of items per page
             //TODO custom pageSize trough browser
             int defaSize = pageSize ?? 5;
+            int defaPageNumber= pageNumber ?? 1;
             ViewData["PageSize"] = defaSize;
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = sortOrder == "MakeName" ? "MakeName desc" : "MakeName";
+            ViewData["NameSortParm"] = sortOrder == "Make.Name" ? "Make.Name desc" : "Make.Name";
             ViewData["DateSortParm"] = sortOrder == "CreatedAt" ? "CreatedAt desc" : "CreatedAt";
             if (searchString != null)
             {
@@ -53,8 +54,9 @@ namespace VehicleProj.Controllers
             {
                 searchString = currentFilter;
             }
+
             ViewData["CurrentFilter"] = searchString;
-            var models =  await vehicleModelService.VehicleModelShowIndex(sortOrder, searchString,pageNumber,defaSize);
+            var models =  await vehicleModelService.VehicleModelShowIndex(new Service.Helpers.IndexArgs(sortOrder,searchString,defaPageNumber,defaSize));
             return View(models);
         }
         [HttpGet]

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text;
 using System.Linq.Dynamic.Core;
+using VehicleProj.Service.Helpers;
 
 namespace VehicleProj.Helpers
 {
@@ -22,14 +23,33 @@ namespace VehicleProj.Helpers
                 if (string.IsNullOrWhiteSpace(param))
                     continue;
                 var propertyFromQueryName = param.Split(" ")[0];
-                var objectProperty = propertyInfos.FirstOrDefault(pi => pi.Name.Equals(propertyFromQueryName, StringComparison.InvariantCultureIgnoreCase));
-                if (objectProperty == null)
-                    continue;
-                var sortingOrder = param.EndsWith(" desc") ? "descending" : "ascending";
-                orderQueryBuilder.Append($"{objectProperty.Name.ToString()} {sortingOrder}, ");
+                if (propertyFromQueryName.Contains("."))
+                {
+                    var temp = propertyFromQueryName.Split(new char[] { '.' }, 2);
+                    var objectProperty = propertyInfos.FirstOrDefault(pi => pi.Name.Equals(temp[0], StringComparison.InvariantCultureIgnoreCase));
+                    Console.WriteLine(temp[0] + " " + temp[1] + "AAAAAAAAAAAAA");
+                    if (objectProperty == null)
+                        continue;
+
+                    var sortingOrder = param.EndsWith(" desc") ? "descending" : "ascending";
+                    orderQueryBuilder.Append($"{objectProperty.Name.ToString()}.{temp[1]} {sortingOrder}, ");
+
+                }
+                else
+                {
+                     var objectProperty = propertyInfos.FirstOrDefault(pi => pi.Name.Equals(propertyFromQueryName, StringComparison.InvariantCultureIgnoreCase));
+                     if (objectProperty == null)
+                         continue;
+                     var sortingOrder = param.EndsWith(" desc") ? "descending" : "ascending";
+                     orderQueryBuilder.Append($"{objectProperty.Name.ToString()} {sortingOrder}, ");
+                }
             }
             var orderQuery = orderQueryBuilder.ToString().TrimEnd(',', ' ');
-             return  entities.OrderBy(orderQuery);
+            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            Console.WriteLine(orderQueryBuilder);
+            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            Console.WriteLine(orderQuery);
+            return  entities.OrderBy(orderQuery);
         }
     }
 }
