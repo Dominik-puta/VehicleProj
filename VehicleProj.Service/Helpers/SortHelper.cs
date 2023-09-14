@@ -27,7 +27,6 @@ namespace VehicleProj.Helpers
                 {
                     var temp = propertyFromQueryName.Split(new char[] { '.' }, 2);
                     var objectProperty = propertyInfos.FirstOrDefault(pi => pi.Name.Equals(temp[0], StringComparison.InvariantCultureIgnoreCase));
-                    Console.WriteLine(temp[0] + " " + temp[1] + "AAAAAAAAAAAAA");
                     if (objectProperty == null)
                         continue;
 
@@ -45,10 +44,6 @@ namespace VehicleProj.Helpers
                 }
             }
             var orderQuery = orderQueryBuilder.ToString().TrimEnd(',', ' ');
-            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            Console.WriteLine(orderQueryBuilder);
-            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            Console.WriteLine(orderQuery);
             return  entities.OrderBy(orderQuery);
         }
     }
