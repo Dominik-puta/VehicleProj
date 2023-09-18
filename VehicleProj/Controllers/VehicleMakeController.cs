@@ -45,6 +45,7 @@ namespace VehicleProj.MVC.Controllers
         {
 
             int defaSize = pageSize ?? 5;
+            int defaPageNumber = pageNumber ?? 1;
             ViewData["PageSize"] = defaSize;
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = sortOrder == "Name" ? "Name desc" : "Name";
@@ -59,7 +60,7 @@ namespace VehicleProj.MVC.Controllers
                 searchString = currentFilter;
             }
             ViewData["CurrentFilter"] = searchString;
-            var models = await vehicleMakeService.VehicleMakeShowIndex(sortOrder, searchString ,pageNumber ,defaSize);
+            var models = await vehicleMakeService.VehicleMakeShowIndex(new Service.Helpers.IndexArgs(sortOrder, searchString, defaPageNumber, defaSize));
             return View(models);
         }
         [HttpGet]

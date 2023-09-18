@@ -3,6 +3,7 @@ using VehicleProj.Service.Data;
 using VehicleProj.Helpers;
 using VehicleProj.Service.Models.Domain;
 using VehicleProj.Service.Services;
+using VehicleProj.Service.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +16,10 @@ builder.Services.AddScoped<IVehicleMakeService,VehicleMakeService>();
 builder.Services.AddScoped<IVehicleModelService,VehicleModelService>();
 builder.Services.AddScoped<ISortHelper<VehicleMake>, SortHelper<VehicleMake>>();
 builder.Services.AddScoped<IFilterHelper<VehicleMake>, FilterHelper<VehicleMake>>();
+builder.Services.AddScoped<IPagingHelper<VehicleMake>, PagingHelper<VehicleMake>>();
 builder.Services.AddScoped<ISortHelper<VehicleModel>, SortHelper<VehicleModel>>();
 builder.Services.AddScoped<IFilterHelper<VehicleModel>,FilterHelper<VehicleModel>>();
+builder.Services.AddScoped<IPagingHelper<VehicleModel>, PagingHelper<VehicleModel>>();
 
 var app = builder.Build();
 

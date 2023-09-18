@@ -38,8 +38,6 @@ namespace VehicleProj.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? pageNumber, int? pageSize)
         {
-            //Number of items per page
-            //TODO custom pageSize trough browser
             int defaSize = pageSize ?? 5;
             int defaPageNumber= pageNumber ?? 1;
             ViewData["PageSize"] = defaSize;

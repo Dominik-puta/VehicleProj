@@ -12,13 +12,15 @@ namespace VehicleProj.Service.Services
         private readonly VehicleProjDbContext vehicleProjDbContext;
         private readonly ISortHelper<VehicleModel> _sortHelper;
         private readonly IFilterHelper<VehicleModel> _filterHelper;
+        private readonly IPagingHelper<VehicleModel> _pagingHelper;
 
 
-        public VehicleModelService( VehicleProjDbContext vehicleProjDbContext, ISortHelper<VehicleModel> sortHelper, IFilterHelper<VehicleModel> filterHelper)
+        public VehicleModelService( VehicleProjDbContext vehicleProjDbContext, ISortHelper<VehicleModel> sortHelper, IFilterHelper<VehicleModel> filterHelper, IPagingHelper<VehicleModel> pagingHelper)
         {
             this.vehicleProjDbContext = vehicleProjDbContext;
             this._sortHelper= sortHelper;
             this._filterHelper = filterHelper;
+            this._pagingHelper = pagingHelper;
         }
 
         public async Task VehicleModelAdd(VehicleModel model)
@@ -32,11 +34,9 @@ namespace VehicleProj.Service.Services
         {
             IQueryable<VehicleModel> vehicleModels = vehicleProjDbContext.VehicleModels.Include(c => c.Make);
             vehicleModels = _filterHelper.ApplyFitler(vehicleModels, indexArgs.searchString, "Make.Name");
-            Console.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            Console.WriteLine(indexArgs.sortOrder);
             vehicleModels = _sortHelper.ApplySort(vehicleModels, indexArgs.sortOrder);
-
-            return await PaginatedList<VehicleModel>.CreateAsync(vehicleModels, indexArgs.pageNumber, indexArgs.pageSize);
+            PagingArgs<VehicleModel> pagingArgs = new PagingArgs<VehicleModel>(vehicleModels, indexArgs.pageNumber, indexArgs.pageSize);
+            return await _pagingHelper.ApplyPaging(pagingArgs);
         }
 
         public async Task VehicleModelDelete(VehicleModel model)
