@@ -10,23 +10,11 @@ namespace VehicleProj.Service.Helpers
     public class PagingHelper<T> : IPagingHelper<T>
     {
         public async Task<PaginatedList<T>> ApplyPaging(PagingArgs<T> pagingArgs){
-            return await PaginatedList<T>.CreateAsync(pagingArgs.entities, pagingArgs.pageIndex, pagingArgs.pageSize);
+            return await PaginatedList<T>.CreateAsync(pagingArgs.Entities, pagingArgs.PageIndex, pagingArgs.PageSize);
 
         }
 
     }
-    public struct PagingArgs<T>
-    {
-        public IQueryable<T> entities { get; set; }
-        public int pageIndex { get; set; }
-        public int pageSize { get; set; }
 
-        public PagingArgs(IQueryable<T> entities, int pageIndex, int pageSize)
-        {
-        this.entities = entities;
-        this.pageIndex = pageIndex;
-            this.pageSize = pageSize;
-        }
-    }
 }
 

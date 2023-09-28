@@ -20,9 +20,9 @@ namespace VehicleProj.Controllers
         }
         
         [HttpGet]
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
-            List<VehicleMake> vehicleMakes = vehicleModelService.ReturnVehicleMakeList();
+            List<VehicleMake> vehicleMakes = await vehicleModelService.ReturnVehicleMakeListAsync();
             ViewData["vehicleMakes"] = vehicleMakes;
             return (IActionResult)View();
         }
@@ -31,7 +31,7 @@ namespace VehicleProj.Controllers
         public async Task<IActionResult> Add(AddVehicleModelViewModel addVehicleModelViewModel)
         {
             VehicleModel vehicleModel = _mapper.Map<AddVehicleModelViewModel, VehicleModel>(addVehicleModelViewModel);
-            await vehicleModelService.VehicleModelAdd(vehicleModel);
+            await vehicleModelService.AddAsync(vehicleModel);
             return RedirectToAction("Index");
         }
 
@@ -54,34 +54,40 @@ namespace VehicleProj.Controllers
             }
 
             ViewData["CurrentFilter"] = searchString;
-            var models =  await vehicleModelService.VehicleModelShowIndex(new Service.Helpers.IndexArgs(sortOrder,searchString,defaPageNumber,defaSize));
+            var models =  await vehicleModelService.ShowIndexAsync(new Service.Helpers.IndexArgs(sortOrder,searchString,defaPageNumber,defaSize));
             return View(models);
         }
         [HttpGet]
         public async Task<IActionResult> View(Guid id)
         {
-            List<VehicleMake> vehicleMakes = vehicleModelService.ReturnVehicleMakeList();
+            List<VehicleMake> vehicleMakes = await vehicleModelService.ReturnVehicleMakeListAsync();
             ViewData["vehicleMakes"] = vehicleMakes;
-            var vehicleModel = await vehicleModelService.VehicleModelShowView(id);
+            var vehicleModel = await vehicleModelService.ShowViewAsync(id);
             UpdateVehicleModelViewModel viewModel = _mapper.Map<VehicleModel, UpdateVehicleModelViewModel>(vehicleModel);
             if(viewModel != null)
             {
+                Response.StatusCode = 200;
                 return View("view" , viewModel);
             }
-            return RedirectToAction("Index");
+            else
+            {
+                Response.StatusCode = 404;
+                ViewData["ErrorMessage"] = "There is no such ID \n" + id.ToString();
+                return View("Error");
+            }
         }
         [HttpPost]
         public async Task<IActionResult> View(UpdateVehicleModelViewModel model)
         {
             VehicleModel vehicleModel = _mapper.Map<UpdateVehicleModelViewModel, VehicleModel>(model);
-            await vehicleModelService.VehicleModelEditView(vehicleModel);
+            await vehicleModelService.EditAsync(vehicleModel);
             return RedirectToAction("Index");
         }
         [HttpPost]
         public async Task<IActionResult> Delete(UpdateVehicleModelViewModel model)
         {
             VehicleModel vehicleModel = _mapper.Map<UpdateVehicleModelViewModel, VehicleModel>(model);
-            await vehicleModelService.VehicleModelDelete(vehicleModel);
+            await vehicleModelService.DeleteAsync(vehicleModel);
             return RedirectToAction("Index");
         }
     }

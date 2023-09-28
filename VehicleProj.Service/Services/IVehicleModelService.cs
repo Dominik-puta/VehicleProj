@@ -5,11 +5,11 @@ namespace VehicleProj.Service.Services
 {
     public interface IVehicleModelService
     {
-        List<VehicleMake> ReturnVehicleMakeList();
-        Task VehicleModelAdd(VehicleModel model);
-        Task VehicleModelDelete(VehicleModel model);
-        Task VehicleModelEditView(VehicleModel model);
-        Task<PaginatedList<VehicleModel>> VehicleModelShowIndex(IndexArgs indexArgs);
-        Task<VehicleModel> VehicleModelShowView(Guid id);
+        Task<List<VehicleMake>> ReturnVehicleMakeListAsync();
+        Task AddAsync(VehicleModel model);
+        Task DeleteAsync(VehicleModel model);
+        Task EditAsync(VehicleModel model);
+        Task<PaginatedList<VehicleModel>> ShowIndexAsync(IndexArgs indexArgs);
+        Task<VehicleModel> ShowViewAsync(Guid id);
     }
 }

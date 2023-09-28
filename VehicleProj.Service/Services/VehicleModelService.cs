@@ -3,7 +3,7 @@ using VehicleProj.Service.Data;
 using VehicleProj.Helpers;
 using VehicleProj.Service.Models.Domain;
 using VehicleProj.Service.Helpers;
-using Microsoft.Data.SqlClient;
+
 
 namespace VehicleProj.Service.Services
 {
@@ -23,23 +23,23 @@ namespace VehicleProj.Service.Services
             this._pagingHelper = pagingHelper;
         }
 
-        public async Task VehicleModelAdd(VehicleModel model)
+        public async Task AddAsync(VehicleModel model)
         {
             var vehicleMake = await vehicleProjDbContext.VehicleMakes.FindAsync(model.MakeId);
            // model.MakeName = vehicleMake.Name;
             await vehicleProjDbContext.VehicleModels.AddAsync(model);
             await vehicleProjDbContext.SaveChangesAsync();
         }
-        public async Task<PaginatedList<VehicleModel>> VehicleModelShowIndex(IndexArgs indexArgs)
+        public async Task<PaginatedList<VehicleModel>> ShowIndexAsync(IndexArgs indexArgs)
         {
             IQueryable<VehicleModel> vehicleModels = vehicleProjDbContext.VehicleModels.Include(c => c.Make);
-            vehicleModels = _filterHelper.ApplyFitler(vehicleModels, indexArgs.searchString, "Make.Name");
-            vehicleModels = _sortHelper.ApplySort(vehicleModels, indexArgs.sortOrder);
-            PagingArgs<VehicleModel> pagingArgs = new PagingArgs<VehicleModel>(vehicleModels, indexArgs.pageNumber, indexArgs.pageSize);
+            vehicleModels = _filterHelper.ApplyFitler(vehicleModels, indexArgs.SearchString, "Make.Name");
+            vehicleModels = _sortHelper.ApplySort(vehicleModels, indexArgs.SortOrder);
+            PagingArgs<VehicleModel> pagingArgs = new PagingArgs<VehicleModel>(vehicleModels, indexArgs.PageNumber, indexArgs.PageSize);
             return await _pagingHelper.ApplyPaging(pagingArgs);
         }
 
-        public async Task VehicleModelDelete(VehicleModel model)
+        public async Task DeleteAsync(VehicleModel model)
         {
             var vehicleModel = await vehicleProjDbContext.VehicleModels.FindAsync(model.Id);
 
@@ -50,18 +50,16 @@ namespace VehicleProj.Service.Services
             }
         }
 
-        public async Task VehicleModelEditView(VehicleModel model)
+        public async Task EditAsync(VehicleModel model)
         {
-            var vehicleMake = await vehicleProjDbContext.VehicleMakes.FindAsync(model.MakeId);
             var vehicleModel = await vehicleProjDbContext.VehicleModels.FindAsync(model.Id);
             if (vehicleModel != null)
-            {
-             //   vehicleModel.MakeName = vehicleMake.Name;        
+            {       
                 await vehicleProjDbContext.SaveChangesAsync();
             }
         }
 
-        public async Task<VehicleModel> VehicleModelShowView(Guid id)
+        public async Task<VehicleModel> ShowViewAsync(Guid id)
         {
             var vehicleModel = await vehicleProjDbContext.VehicleModels.FirstOrDefaultAsync(x => x.Id == id);
             if (vehicleModel != null)
@@ -70,9 +68,9 @@ namespace VehicleProj.Service.Services
             }
             return null;
         }
-        public List<VehicleMake> ReturnVehicleMakeList()
+        public async Task<List<VehicleMake>> ReturnVehicleMakeListAsync()
         {
-            return vehicleProjDbContext.VehicleMakes.ToList();
+            return await vehicleProjDbContext.VehicleMakes.ToListAsync();
         }
     }
 }

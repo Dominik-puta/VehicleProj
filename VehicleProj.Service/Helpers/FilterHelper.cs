@@ -1,4 +1,5 @@
-﻿using System.Linq.Dynamic.Core;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace VehicleProj.Helpers
 {
@@ -12,9 +13,9 @@ namespace VehicleProj.Helpers
             {
                 return entities;
             }
-            searchString= searchString.Trim();
+            searchString = searchString.Trim();
             searchBy = searchBy.Trim();
-            String Search = searchBy + " ==@0 ";
+            string Search = searchBy + " ==@0 ";
 
 
             return entities.Where(Search, searchString);
