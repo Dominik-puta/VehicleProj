@@ -12,6 +12,7 @@ namespace VehicleProj.Helpers
 
 
             CreateMap<VehicleMake, IndexVehicleMakeViewModel>().ReverseMap();
+           // CreateMap<PaginatedList<VehicleMake>, PaginatedList<IndexVehicleMakeViewModel>>().ReverseMap();
             CreateMap<VehicleMake, UpdateVehicleMakeViewModel>().ReverseMap();
             CreateMap<AddVehicleMakeViewModel, VehicleMake>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(u =>  Guid.NewGuid()))

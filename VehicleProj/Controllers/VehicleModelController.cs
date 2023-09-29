@@ -55,7 +55,12 @@ namespace VehicleProj.Controllers
 
             ViewData["CurrentFilter"] = searchString;
             var models =  await vehicleModelService.ShowIndexAsync(new Service.Helpers.IndexArgs(sortOrder,searchString,defaPageNumber,defaSize));
-            return View(models);
+            PaginatedList<IndexVehicleModelViewModel> viewModels = new PaginatedList<IndexVehicleModelViewModel>(
+                _mapper.Map<List<VehicleModel>, List<IndexVehicleModelViewModel>>(models),
+                models.TotalPages,
+                models.PageIndex,
+                defaSize);
+            return View(viewModels);
         }
         [HttpGet]
         public async Task<IActionResult> View(Guid id)

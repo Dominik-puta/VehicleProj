@@ -1,4 +1,4 @@
-﻿@model PaginatedList<VehicleProj.Service.Models.Domain.VehicleMake>
+﻿@model PaginatedList<VehicleProj.MVC.Models.IndexVehicleMakeViewModel>
 
 @ViewBag.VehicleMakeNames
 
@@ -17,13 +17,13 @@
     </div>
 </form>
 <h5>Page Size:</h5>
-  <ul class="pagination">
+<ul class="pagination">
     <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pageSize="5">5</a></li>
     <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pageSize="10">10</a></li>
     <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pageSize="15">15</a></li>
     <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pageSize="20">20</a></li>
     <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pageSize="25">25</a></li>
-  </ul>
+</ul>
 
 
 <table class="table">
@@ -37,7 +37,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var vehicleMake in Model )
+        @foreach (var vehicleMake in Model)
         {
             <tr>
                 <td>@vehicleMake.Id</td>

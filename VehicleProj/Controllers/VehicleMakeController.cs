@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
 using VehicleProj.MVC.Models;
+using VehicleProj.Service.Helpers;
 using VehicleProj.Service.Models.Domain;
 using VehicleProj.Service.Services;
 
@@ -60,8 +61,13 @@ namespace VehicleProj.MVC.Controllers
                 searchString = currentFilter;
             }
             ViewData["CurrentFilter"] = searchString;
-            PaginatedList<VehicleMake> models = await vehicleMakeService.ShowIndexAsync(new Service.Helpers.IndexArgs(sortOrder, searchString, defaPageNumber, defaSize));
-            return View(models);
+            PaginatedList<VehicleMake> models = await vehicleMakeService.ShowIndexAsync(new IndexArgs(sortOrder, searchString, defaPageNumber, defaSize));
+            PaginatedList<IndexVehicleMakeViewModel> viewModels = new PaginatedList<IndexVehicleMakeViewModel>(
+                _mapper.Map<List<VehicleMake>, List<IndexVehicleMakeViewModel>>(models),
+                models.TotalPages,
+                models.PageIndex,
+                defaSize);
+            return View(viewModels);
         }
         [HttpGet]
         public async Task<IActionResult> View(Guid id)
