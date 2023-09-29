@@ -74,9 +74,6 @@ namespace VehicleProj.MVC.Controllers
         {
 
             VehicleMake vehicleMake =  await vehicleMakeService.ShowViewAsync(id);
-
-            if (vehicleMake == null)
-                Console.WriteLine("AAAA");
            
             if (vehicleMake != null)
             {
