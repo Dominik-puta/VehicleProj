@@ -7,8 +7,8 @@ namespace VehicleProj.Service.Services
     {
         Task<List<VehicleMake>> ReturnVehicleMakeListAsync();
         Task AddAsync(VehicleModel model);
-        Task DeleteAsync(VehicleModel model);
-        Task EditAsync(VehicleModel model);
+        Task<Boolean> DeleteAsync(VehicleModel viewModel);
+        Task<Boolean> EditAsync(VehicleModel viewModel);
         Task<PaginatedList<VehicleModel>> ShowIndexAsync(IndexArgs indexArgs);
         Task<VehicleModel> ShowViewAsync(Guid id);
     }

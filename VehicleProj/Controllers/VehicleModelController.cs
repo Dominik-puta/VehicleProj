@@ -82,18 +82,32 @@ namespace VehicleProj.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> View(UpdateVehicleModelViewModel model)
+        public async Task<IActionResult> View(UpdateVehicleModelViewModel viewModel)
         {
-            VehicleModel vehicleModel = _mapper.Map<UpdateVehicleModelViewModel, VehicleModel>(model);
-            await vehicleModelService.EditAsync(vehicleModel);
-            return RedirectToAction("Index");
+            VehicleModel vehicleModel = _mapper.Map<UpdateVehicleModelViewModel, VehicleModel>(viewModel);
+            Boolean succeded = await vehicleModelService.EditAsync(vehicleModel);
+            if (succeded)
+                return RedirectToAction("Index");
+            else
+            {
+                Response.StatusCode = 500;
+                ViewData["ErrorMessage"] = "Unable to update Vehicle Model";
+                return View("Error");
+            }
         }
         [HttpPost]
-        public async Task<IActionResult> Delete(UpdateVehicleModelViewModel model)
+        public async Task<IActionResult> Delete(UpdateVehicleModelViewModel viewModel)
         {
-            VehicleModel vehicleModel = _mapper.Map<UpdateVehicleModelViewModel, VehicleModel>(model);
-            await vehicleModelService.DeleteAsync(vehicleModel);
-            return RedirectToAction("Index");
+            VehicleModel vehicleModel = _mapper.Map<UpdateVehicleModelViewModel, VehicleModel>(viewModel);
+            Boolean succeded = await vehicleModelService.DeleteAsync(vehicleModel);
+            if (succeded)
+                return RedirectToAction("Index");
+            else
+            {
+                Response.StatusCode = 500;
+                ViewData["ErrorMessage"] = "Unable to delete Vehicle Model";
+                return View("Error");
+            }
         }
     }
 }

@@ -94,18 +94,32 @@ namespace VehicleProj.MVC.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult> View(UpdateVehicleMakeViewModel model)
+        public async Task<IActionResult> View(UpdateVehicleMakeViewModel viewModel)
         {
-            VehicleMake vehicleMake = _mapper.Map<UpdateVehicleMakeViewModel, VehicleMake>(model);
-            await vehicleMakeService.EditAsync(vehicleMake);
-            return RedirectToAction("Index");
+            VehicleMake vehicleMake = _mapper.Map<UpdateVehicleMakeViewModel, VehicleMake>(viewModel);
+            Boolean succeded = await vehicleMakeService.EditAsync(vehicleMake);
+            if (succeded)
+                return RedirectToAction("Index");
+            else
+            {
+                Response.StatusCode = 404;
+                ViewData["ErrorMessage"] = "Unable to update Vehicle Make";
+                return View("Error");
+            }
         }
         [HttpPost]
-        public async Task<IActionResult> Delete(UpdateVehicleMakeViewModel model)
+        public async Task<IActionResult> Delete(UpdateVehicleMakeViewModel viewModel)
         {
-            VehicleMake vehicleMake = _mapper.Map<UpdateVehicleMakeViewModel, VehicleMake>(model);
-            await vehicleMakeService.DeleteAsync(vehicleMake);
-            return RedirectToAction("Index");
+            VehicleMake vehicleMake = _mapper.Map<UpdateVehicleMakeViewModel, VehicleMake>(viewModel);
+            Boolean succeded =  await vehicleMakeService.DeleteAsync(vehicleMake);
+            if (succeded)
+                return RedirectToAction("Index");
+            else
+            {
+                Response.StatusCode = 404;
+                ViewData["ErrorMessage"] = "Unable to delete Vehicle Make";
+                return View("Error");
+            }
         }
     }
 }

@@ -5,8 +5,8 @@ namespace VehicleProj.Service.Services
     public interface IVehicleMakeService
     {
         Task AddAsync(VehicleMake vehicleMake);
-        Task DeleteAsync(VehicleMake vehicleMake);
-        Task EditAsync(VehicleMake vehicleMake);
+        Task<Boolean> DeleteAsync(VehicleMake vehicleMake);
+        Task<Boolean> EditAsync(VehicleMake vehicleMake);
         Task<PaginatedList<VehicleMake>> ShowIndexAsync(IndexArgs indexArgs);
         Task<VehicleMake> ShowViewAsync(Guid id);
     }

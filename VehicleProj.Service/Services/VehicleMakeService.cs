@@ -51,21 +51,33 @@ namespace VehicleProj.Service.Services
             }
              return null;
         }
-        public async Task EditAsync(VehicleMake model)
+        public async Task<Boolean> EditAsync(VehicleMake model)
         {
             var vehicleMake = await vehicleProjDbContext.VehicleMakes.FindAsync(model.Id);
             if (vehicleMake != null)
             {
+                vehicleMake.Name= model.Name;
+                vehicleMake.Abrv= model.Abrv;
                 await vehicleProjDbContext.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
-        public async Task DeleteAsync(VehicleMake model)
+        public async Task<Boolean> DeleteAsync(VehicleMake model)
         {
             var vehicleMake = await vehicleProjDbContext.VehicleMakes.FindAsync(model.Id);
             if (vehicleMake != null)
             {
                 vehicleProjDbContext.VehicleMakes.Remove(vehicleMake);
                 await vehicleProjDbContext.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

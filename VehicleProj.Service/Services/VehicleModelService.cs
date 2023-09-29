@@ -39,7 +39,7 @@ namespace VehicleProj.Service.Services
             return await _pagingHelper.ApplyPaging(pagingArgs);
         }
 
-        public async Task DeleteAsync(VehicleModel model)
+        public async Task<Boolean> DeleteAsync(VehicleModel model)
         {
             var vehicleModel = await vehicleProjDbContext.VehicleModels.FindAsync(model.Id);
 
@@ -47,15 +47,28 @@ namespace VehicleProj.Service.Services
             {
                 vehicleProjDbContext.VehicleModels.Remove(vehicleModel);
                 await vehicleProjDbContext.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
-        public async Task EditAsync(VehicleModel model)
+        public async Task<Boolean> EditAsync(VehicleModel model)
         {
             var vehicleModel = await vehicleProjDbContext.VehicleModels.FindAsync(model.Id);
             if (vehicleModel != null)
-            {       
+            {
+                vehicleModel.Name = model.Name;
+                vehicleModel.Abrv = model.Abrv;
+                vehicleModel.MakeId = model.MakeId;
                 await vehicleProjDbContext.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
